@@ -24,26 +24,24 @@
     border-radius:15px;
     box-shadow:0 20px 50px rgba(0,0,0,0.6);
   }
-  h1{
-    margin:0;
-    color:#7ee7ff;
-  }
+  h1{margin:0;color:#7ee7ff}
   button{
     padding:10px 15px;
     border:none;
     border-radius:8px;
     cursor:pointer;
     font-weight:bold;
+    margin-right:6px;
   }
-  .start{background:#00e5ff;}
-  .stop{background:#ff5c5c;}
+  .start{background:#00e5ff}
+  .stop{background:#ff5c5c}
   .small{background:#333;color:white}
   .box{
     background:rgba(0,0,0,0.3);
     padding:12px;
     border-radius:8px;
     min-height:120px;
-    margin-top:10px;
+    margin-top:8px;
   }
 </style>
 </head>
@@ -71,7 +69,6 @@ const recognition = new SpeechRecognition();
 recognition.lang = "en-IN";
 recognition.continuous = false;
 
-let speaking = false;
 let lastReply = "";
 
 const transcriptEl = document.getElementById("transcript");
@@ -90,18 +87,21 @@ recognition.onresult = async (e)=>{
   replyEl.innerText = "Searching...";
 
   try{
-    // Wikipedia search using CORS-safe proxy
-    const searchURL =
+    const wikiURL =
       "https://api.allorigins.win/raw?url=" +
       encodeURIComponent(
         "https://en.wikipedia.org/api/rest_v1/page/summary/" +
         query.replaceAll(" ", "_")
       );
 
-    const res = await fetch(searchURL);
-    const data = await res.json();
+    const res = await fetch(wikiURL);
+    const text = await res.text();
+    const data = JSON.parse(text);
 
-    const answer = data.extract || "Sorry, I could not find an answer.";
+    const answer = data.extract
+      ? data.extract
+      : "Sorry, I could not find an answer.";
+
     replyEl.innerText = answer;
     lastReply = answer;
     speak(answer);
@@ -115,14 +115,4 @@ document.getElementById("startBtn").onclick = ()=>{
   recognition.start();
 };
 
-document.getElementById("stopBtn").onclick = ()=>{
-  recognition.stop();
-  window.speechSynthesis.cancel();
-};
-
-document.getElementById("repeatBtn").onclick = ()=>{
-  if(lastReply) speak(lastReply);
-};
-</script>
-</body>
-</html>
+document.getElementById("stopBtn").onclick

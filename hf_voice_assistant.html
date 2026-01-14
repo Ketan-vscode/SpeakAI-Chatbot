@@ -3,238 +3,126 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>SpeakAI — Hugging Face Chatbot</title>
+<title>SpeakAI — Smart Assistant</title>
+
 <style>
-  :root{
-    --bg1:#0f2027; --bg2:#203a43; --glass: rgba(255,255,255,0.06);
-    --accent:#7ee7ff; --muted:rgba(255,255,255,0.85);
-  }
-  *{box-sizing:border-box}
   body{
-    margin:0; height:100vh; display:flex; align-items:center; justify-content:center;
-    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial; padding:20px;
-    background: radial-gradient(circle at 10% 10%, var(--bg1), var(--bg2));
-    color:#eafcff;
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    font-family:Arial, sans-serif;
+    color:white;
   }
   .card{
-    width:100%; max-width:860px; border-radius:14px; padding:20px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,255,255,0.04); box-shadow: 0 16px 50px rgba(0,0,0,0.6);
-    backdrop-filter: blur(8px);
+    width:90%;
+    max-width:850px;
+    background:rgba(0,0,0,0.35);
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.6);
   }
-  header{display:flex; gap:12px; align-items:center}
-  h1{margin:0; color:var(--accent); font-size:20px}
-  p.sub{margin:0; color:var(--muted); font-size:13px}
-  .controls{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center}
-  button{padding:10px 14px; border-radius:10px; border:none; cursor:pointer;
-    font-weight:700; background:linear-gradient(90deg,#00e5ff,#0078ff); color:#002; box-shadow:0 8px 20px rgba(0,140,255,0.12)}
-  .small{padding:8px 10px; background:rgba(255,255,255,0.03); color:var(--muted)}
-  .pill{padding:8px 12px; border-radius:999px; background:var(--glass); color:var(--muted); font-weight:600}
-  .row{display:flex; gap:14px; margin-top:16px}
-  .col{flex:1}
-  .box{background:rgba(0,0,0,0.15); padding:12px; border-radius:10px; min-height:120px; overflow:auto; font-size:15px}
-  .label{font-size:13px; color:var(--muted); margin-bottom:8px}
-  footer{margin-top:12px; color:var(--muted); text-align:center; font-size:13px}
-  .status{font-size:13px; color:var(--muted); margin-left:8px}
-  .loader{display:inline-block;width:10px;height:10px;border-radius:50%;background:#7ee7ff;box-shadow:0 0 8px #7ee7ff; margin-left:8px; animation:blink 1s infinite}
-  @keyframes blink{0%{opacity:0.2}50%{opacity:1}100%{opacity:0.2}}
-  @media(max-width:760px){ .row{flex-direction:column} }
+  h1{
+    margin:0;
+    color:#7ee7ff;
+  }
+  button{
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+  }
+  .start{background:#00e5ff;}
+  .stop{background:#ff5c5c;}
+  .small{background:#333;color:white}
+  .box{
+    background:rgba(0,0,0,0.3);
+    padding:12px;
+    border-radius:8px;
+    min-height:120px;
+    margin-top:10px;
+  }
 </style>
 </head>
+
 <body>
-  <div class="card">
-    <header>
-      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 6px 14px rgba(0,255,255,0.06))">
-        <circle cx="12" cy="12" r="10" fill="#002b3a"/>
-        <path d="M9 9c0-1.5 1.2-3 3-3s3 1.5 3 3v2c0 1.5-1.2 3-3 3s-3-1.5-3-3V9z" fill="#7ee7ff"/>
-      </svg>
-      <div>
-        <h1>SpeakAI — Chatbot (Hugging Face)</h1>
-        <p class="sub">Voice → Hugging Face → Voice. Paste your HF token below and press Start.</p>
-      </div>
-      <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
-        <div class="pill">Model: <span id="modelLabel" style="margin-left:6px; font-weight:800">google/flan-t5-large</span></div>
-      </div>
-    </header>
+<div class="card">
+  <h1>🎙 SpeakAI — Smart Assistant</h1>
+  <p>Ask any basic question using your voice</p>
 
-    <div class="controls">
-      <button id="startBtn">🎤 Start Listening</button>
-      <button id="stopBtn" class="small">⏹ Stop</button>
-      <button id="speakBtn" class="small">🔊 Repeat Reply</button>
-      <button id="clearBtn" class="small">🧹 Clear</button>
+  <button class="start" id="startBtn">🎤 Start</button>
+  <button class="stop" id="stopBtn">⏹ Stop</button>
+  <button class="small" id="repeatBtn">🔊 Repeat</button>
 
-      <div style="margin-left:12px">
-        <span class="label" style="display:block; margin-bottom:6px">Hugging Face Token (paste here for quick demo)</span>
-        <input id="hfToken" type="password" placeholder="hf_xxx..." style="padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); width:320px; background:rgba(0,0,0,0.12); color:#eafcff"/>
-      </div>
+  <h3>You said:</h3>
+  <div class="box" id="transcript">(nothing yet)</div>
 
-      <div style="margin-left:auto; display:flex; align-items:center">
-        <div class="pill" id="status">Idle</div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col">
-        <div class="label">Transcript (what you said)</div>
-        <div id="transcript" class="box">(Nothing yet)</div>
-      </div>
-
-      <div class="col">
-        <div class="label">Assistant reply</div>
-        <div id="reply" class="box">AI reply will appear here</div>
-      </div>
-    </div>
-
-    <div style="margin-top:12px; display:flex; gap:10px; align-items:center">
-      <div class="label" style="margin:0">Model (change if you know another):</div>
-      <select id="modelSelect" style="padding:8px 10px; border-radius:8px; background:rgba(0,0,0,0.12); color:#eafcff; border:1px solid rgba(255,255,255,0.03)">
-        <option value="google/flan-t5-large">google/flan-t5-large (good)</option>
-        <option value="tiiuae/falcon-7b-instruct">tiiuae/falcon-7b-instruct (instruct)</option>
-        <option value="gpt2">gpt2 (small)</option>
-        <option value="google/flan-t5-xl">google/flan-t5-xl (bigger)</option>
-      </select>
-      <div class="status" id="explain">Tip: For best chatty answers choose an *instruct* model like flan-t5 or falcon-instruct.</div>
-    </div>
-
-    <footer>Made by Ketan — Paste your HF token for demo only. For public hosting, see notes below.</footer>
-  </div>
+  <h3>Answer:</h3>
+  <div class="box" id="reply">Waiting for question...</div>
+</div>
 
 <script>
-/* ---- Voice + Hugging Face Chatbot (browser-only) ----
-   - Paste your Hugging Face token into the box (hf_xxx...)
-   - This example calls Hugging Face Inference API directly from browser.
-   - SECURITY: token in client = visible to anyone. Use only for short demo or private share.
-----------------------------------------------------*/
-
-const startBtn = document.getElementById('startBtn');
-const stopBtn  = document.getElementById('stopBtn');
-const speakBtn = document.getElementById('speakBtn');
-const clearBtn = document.getElementById('clearBtn');
-const hfTokenInput = document.getElementById('hfToken');
-const transcriptEl = document.getElementById('transcript');
-const replyEl = document.getElementById('reply');
-const statusP = document.getElementById('status');
-const modelSelect = document.getElementById('modelSelect');
-const modelLabel = document.getElementById('modelLabel');
-
-let lastReply = '';
-modelSelect.addEventListener('change', ()=> modelLabel.textContent = modelSelect.value);
-
-/* Speech Recognition setup */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if(!SpeechRecognition){
-  alert("Speech Recognition not supported. Use Chrome desktop.");
-}
 const recognition = new SpeechRecognition();
-recognition.lang = 'en-IN';
-recognition.interimResults = false;
+
+recognition.lang = "en-IN";
 recognition.continuous = false;
 
-/* TTS */
+let speaking = false;
+let lastReply = "";
+
+const transcriptEl = document.getElementById("transcript");
+const replyEl = document.getElementById("reply");
+
 function speak(text){
-  if(!text) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-IN';
-  u.rate = 1;
-  u.pitch = 1;
+  u.lang = "en-IN";
   window.speechSynthesis.speak(u);
 }
 
-/* UI helpers */
-function setStatus(s, loading=false){
-  statusP.textContent = s;
-  if(loading) statusP.innerHTML = s + ' <span class="loader"></span>';
-}
-function setTranscript(t){ transcriptEl.textContent = t; }
-function setReply(t){ replyEl.textContent = t; lastReply = t; }
+recognition.onresult = async (e)=>{
+  const query = e.results[0][0].transcript;
+  transcriptEl.innerText = query;
+  replyEl.innerText = "Searching...";
 
-/* Hugging Face call (text generation) */
-async function callHuggingFace(model, token, prompt){
-  // Basic guard
-  if(!token || !token.startsWith('hf_')) throw new Error('Invalid Hugging Face token (starts with hf_)');
-
-  setStatus('Sending to HF...', true);
-  // Build body - using text generation mode
-  const body = { inputs: prompt, options:{ wait_for_model:true }, parameters: { max_new_tokens: 300 } };
-
-  const endpoint = `https://api-inference.huggingface.co/models/${model}`;
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-
-  if(!res.ok){
-    const txt = await res.text().catch(()=>res.statusText);
-    throw new Error('HF error: ' + res.status + ' — ' + txt);
-  }
-  const data = await res.json();
-  // Response shapes differ by model; try to find generated text
-  let text = '';
-  if(Array.isArray(data) && data[0] && data[0].generated_text) text = data[0].generated_text;
-  else if(data.generated_text) text = data.generated_text;
-  else if(data?.error) throw new Error(data.error);
-  else {
-    // some models return { "choices": [ {"text": "..."} ] }
-    try{
-      if(data.choices && data.choices[0] && (data.choices[0].text || data.choices[0].message?.content)) {
-        text = data.choices[0].text || data.choices[0].message.content;
-      } else {
-        text = JSON.stringify(data);
-      }
-    }catch(e){ text = JSON.stringify(data); }
-  }
-  return text;
-}
-
-/* Recognition flow */
-recognition.onstart = () => { setStatus('Listening...'); setTranscript('(Listening...)'); setReply(''); };
-recognition.onend = () => { setStatus('Idle'); };
-recognition.onerror = (e) => { setStatus('Error: ' + (e.error||e.message)); };
-
-recognition.onresult = async (e) => {
-  const text = e.results[0][0].transcript;
-  setTranscript(text);
-  setReply('Thinking...');
   try{
-    const token = hfTokenInput.value.trim();
-    const model = modelSelect.value;
-    // Compose prompt with light system instruction for chatty responses
-    const prompt = `You are a helpful, friendly AI assistant. Answer concisely and clearly.\n\nUser: ${text}\nAssistant:`;
-    const aiText = await callHuggingFace(model, token, prompt);
-    // Clean up: remove prompt echo if present
-    let reply = aiText;
-    // If the model returns "User: ... Assistant: <answer>" remove everything before Assistant:
-    const assIdx = reply.indexOf('Assistant:');
-    if(assIdx!==-1) reply = reply.slice(assIdx + 'Assistant:'.length).trim();
-    setReply(reply);
-    speak(reply);
-    setStatus('Done');
+    // Wikipedia search using CORS-safe proxy
+    const searchURL =
+      "https://api.allorigins.win/raw?url=" +
+      encodeURIComponent(
+        "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+        query.replaceAll(" ", "_")
+      );
+
+    const res = await fetch(searchURL);
+    const data = await res.json();
+
+    const answer = data.extract || "Sorry, I could not find an answer.";
+    replyEl.innerText = answer;
+    lastReply = answer;
+    speak(answer);
+
   }catch(err){
-    console.error(err);
-    setReply('Error: ' + err.message);
-    setStatus('Error');
+    replyEl.innerText = "Error fetching information.";
   }
 };
 
-/* Buttons */
-startBtn.onclick = ()=> {
-  try{ recognition.start(); } catch(e){ console.warn(e); setStatus('Could not start: '+e.message); }
+document.getElementById("startBtn").onclick = ()=>{
+  recognition.start();
 };
-stopBtn.onclick = ()=> { recognition.stop(); setStatus('Stopped'); };
-speakBtn.onclick = ()=> { if(lastReply) speak(lastReply); else setStatus('Nothing to speak'); };
-clearBtn.onclick = ()=> { setTranscript('(Nothing yet)'); setReply('AI reply will appear here'); hfTokenInput.value=''; setStatus('Idle'); };
 
-/* Helpful UX: press Enter in token field to keep focus */
-hfTokenInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') e.target.blur(); });
+document.getElementById("stopBtn").onclick = ()=>{
+  recognition.stop();
+  window.speechSynthesis.cancel();
+};
 
-/* initial state */
-setStatus('Idle');
-
+document.getElementById("repeatBtn").onclick = ()=>{
+  if(lastReply) speak(lastReply);
+};
 </script>
 </body>
 </html>
